@@ -94,7 +94,7 @@ export default function Home() {
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-sm font-bold">
               AI
             </div>
-            <span className="text-xl font-bold">TextAPI</span>
+            <span className="text-xl font-bold">AI CFSSR</span>
           </div>
           <nav className="flex items-center gap-6 text-sm text-gray-400">
             <a href="#pricing" className="hover:text-white transition">Pricing</a>
@@ -110,7 +110,7 @@ export default function Home() {
           Pay with Crypto, Get Instant API Access
         </div>
         <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          AI Text Processing API
+          AI CFSSR - Text Processing API
         </h1>
         <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-8">
           Paraphrase, summarize, grammar check, expand, and simplify text with a single API call.
@@ -394,7 +394,7 @@ export default function Home() {
       <footer className="border-t border-gray-800 mt-16">
         <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="text-gray-500 text-sm">
-            2026 TextAPI. Accepts USDT (TRC20) payments.
+            2026 AI CFSSR. Accepts USDT (TRC20) payments.
           </div>
           <div className="flex items-center gap-4 text-sm text-gray-500">
             <span>Powered by Next.js + Vercel</span>

@@ -25,6 +25,8 @@ export default function Home() {
   const [testResult, setTestResult] = useState('');
   const [demoKey, setDemoKey] = useState('');
   const [senderAddress, setSenderAddress] = useState('');
+  const [email, setEmail] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
 
   const handlePurchase = async (plan: string) => {
     setLoading(true);
@@ -55,6 +57,25 @@ export default function Home() {
       if (data.apiKey) {
         setApiKey(data.apiKey);
         setDemoKey(data.apiKey);
+        
+        // Send email with API key
+        if (email) {
+          try {
+            await fetch('/api/email/send', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email,
+                apiKey: data.apiKey,
+                plan: data.plan,
+                credits: data.credits,
+              }),
+            });
+            setEmailSent(true);
+          } catch {
+            console.error('Failed to send email');
+          }
+        }
       }
     } catch (err) {
       console.error(err);
@@ -219,6 +240,16 @@ export default function Home() {
                   className="w-full p-3 bg-gray-800 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none font-mono text-sm mt-1"
                 />
               </div>
+              <div>
+                <label className="text-sm text-gray-400">Email (to receive API key)</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full p-3 bg-gray-800 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none text-sm mt-1"
+                />
+              </div>
               <button
                 onClick={handleVerify}
                 disabled={loading}
@@ -248,6 +279,11 @@ export default function Home() {
             <p className="text-sm text-gray-400 mt-3">
               Keep this key secure. Use it in the x-api-key header for all API calls.
             </p>
+            {emailSent && (
+              <p className="text-sm text-green-400 mt-2">
+                ✓ API key has been sent to {email}
+              </p>
+            )}
           </div>
         </div>
       )}

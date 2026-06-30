@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { getPayment, confirmPayment, createApiKey } from '@/lib/storage';
 import { verifyUsdtPayment, isValidTronAddress } from '@/lib/tron';
 
-// Your TRON wallet address (replace with your actual address)
-const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS || '';
+// Your TRON wallet address
+const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS || 'TBfAn71a2GjcpGtd5noRAE59QnvkEj7uME';
 const TRONGRID_API_KEY = process.env.TRONGRID_API_KEY || '';
 
 export async function GET(request: Request) {
@@ -44,13 +44,10 @@ export async function GET(request: Request) {
         );
       }
 
-      // For production: uncomment to use real blockchain verification
-      // For demo: we use simulated verification
-      
-      /*
+      // Verify on blockchain using TronGrid API
       const result = await verifyUsdtPayment(
         senderAddress,
-        payment.address,
+        MY_TRON_ADDRESS,
         payment.amount,
         60, // within last 60 minutes
         TRONGRID_API_KEY
@@ -59,16 +56,12 @@ export async function GET(request: Request) {
       if (!result.confirmed) {
         return NextResponse.json({
           status: 'pending',
-          message: result.error || 'Payment not yet confirmed on blockchain',
+          message: result.error || 'Payment not yet confirmed on blockchain. Please wait a few minutes and try again.',
         });
       }
-      */
-
-      // Demo: auto-confirm (remove this block in production)
-      // In production, the verifyUsdtPayment function above will be used
     }
 
-    // Confirm payment
+    // Confirm payment and generate API key
     const confirmed = confirmPayment(paymentId);
     
     if (confirmed) {

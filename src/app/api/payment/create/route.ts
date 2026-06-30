@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createPayment, PLANS } from '@/lib/storage';
 
 // Your TRON wallet address for receiving payments
-const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS || '';
+const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS || 'TBfAn71a2GjcpGtd5noRAE59QnvkEj7uME';
 
 export async function POST(request: Request) {
   try {

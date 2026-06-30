@@ -54,6 +54,18 @@ Verify API key and check remaining credits.
 
 ## Getting Started
 
+1. Copy `.env.example` to `.env.local`:
+```bash
+cp .env.example .env.local
+```
+
+2. Set your TRON wallet address:
+```
+MY_TRON_ADDRESS=YOUR_TRON_WALLET_ADDRESS
+TRONGRID_API_KEY=YOUR_TRONGRID_API_KEY
+```
+
+3. Run the development server:
 ```bash
 npm install
 npm run dev

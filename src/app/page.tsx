@@ -24,6 +24,7 @@ export default function Home() {
   const [testMode, setTestMode] = useState('paraphrase');
   const [testResult, setTestResult] = useState('');
   const [demoKey, setDemoKey] = useState('');
+  const [senderAddress, setSenderAddress] = useState('');
 
   const handlePurchase = async (plan: string) => {
     setLoading(true);
@@ -49,7 +50,7 @@ export default function Home() {
     setLoading(true);
     
     try {
-      const res = await fetch(`/api/payment/verify?paymentId=${paymentInfo.paymentId}`);
+      const res = await fetch(`/api/payment/verify?paymentId=${paymentInfo.paymentId}&senderAddress=${senderAddress}`);
       const data = await res.json();
       if (data.apiKey) {
         setApiKey(data.apiKey);
@@ -207,6 +208,16 @@ export default function Home() {
               </div>
               <div className="text-sm text-gray-400">
                 Network: {paymentInfo.network}
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Your TRON wallet address (for verification)</label>
+                <input
+                  type="text"
+                  value={senderAddress}
+                  onChange={(e) => setSenderAddress(e.target.value)}
+                  placeholder="T..."
+                  className="w-full p-3 bg-gray-800 rounded-lg border border-gray-700 focus:border-blue-500 focus:outline-none font-mono text-sm mt-1"
+                />
               </div>
               <button
                 onClick={handleVerify}

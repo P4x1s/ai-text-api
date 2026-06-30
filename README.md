@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TextAPI - AI Text Processing API with Crypto Payments
+
+A monetizable AI text processing API that accepts USDT (TRC20) cryptocurrency payments.
+
+## Features
+
+- **Text Processing API** - Paraphrase, summarize, grammar check, expand, and simplify text
+- **Crypto Payments** - Accept USDT (TRC20) for API credits
+- **API Key Management** - Instant key generation after payment
+- **Live Testing** - Test the API directly from the web interface
+
+## Tech Stack
+
+- **Frontend**: Next.js 16 + React 19 + Tailwind CSS 4
+- **Backend**: Next.js Route Handlers
+- **Deployment**: GitHub + Vercel
+
+## API Endpoints
+
+### `POST /api/payment/create`
+Create a new payment request.
+
+```bash
+curl -X POST https://your-domain.com/api/payment/create \
+  -H "Content-Type: application/json" \
+  -d '{"plan": "starter"}'
+```
+
+### `GET /api/payment/verify?paymentId=xxx`
+Verify payment and get API key.
+
+### `POST /api/process/text`
+Process text with AI models.
+
+```bash
+curl -X POST https://your-domain.com/api/process/text \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: aitx_your_key_here" \
+  -d '{"text": "Your text here", "mode": "paraphrase"}'
+```
+
+Modes: `paraphrase`, `summarize`, `grammar`, `expand`, `simplify`
+
+### `GET /api/key/verify?key=xxx`
+Verify API key and check remaining credits.
+
+## Pricing
+
+| Plan | Price | Credits |
+|------|-------|---------|
+| Starter | $5 USDT | 1,000 calls |
+| Pro | $20 USDT | 10,000 calls |
+| Enterprise | $100 USDT | 100,000 calls |
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Push to GitHub
+2. Connect to Vercel
+3. Deploy automatically
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Production TODO
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [ ] Integrate real AI API (OpenAI, Anthropic, etc.)
+- [ ] Add blockchain payment verification (TronGrid API)
+- [ ] Add database (PostgreSQL, Redis)
+- [ ] Add rate limiting
+- [ ] Add webhook for payment confirmations

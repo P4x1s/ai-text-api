@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "AI CFSSR - Text Processing API",
   description: "AI-powered text processing API. Paraphrase, summarize, grammar check, expand, and simplify text. Pay with USDT (TRC20).",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon.svg",
   },
 };
 

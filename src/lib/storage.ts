@@ -1,15 +1,15 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-// Lazy initialize Supabase client
+// Lazy initialize Supabase client (use secret key for server-side)
 let supabase: SupabaseClient | null = null;
 
 function getSupabase(): SupabaseClient {
   if (!supabase) {
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_ANON_KEY;
+    const key = process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_ANON_KEY;
     
     if (!url || !key) {
-      throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY are required');
+      throw new Error('SUPABASE_URL and SUPABASE_SECRET_KEY are required');
     }
     
     supabase = createClient(url, key);

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getApiKey, useCredit } from '@/lib/storage';
 import { processWithAi } from '@/lib/ai';
 
 export async function POST(request: Request) {
@@ -12,11 +13,28 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify API key format (starts with aitx_)
+    // Verify API key format
     if (!apiKeyHeader.startsWith('aitx_')) {
       return NextResponse.json(
         { error: 'Invalid API key format' },
         { status: 401 }
+      );
+    }
+
+    // Check if API key exists in database
+    const apiKey = await getApiKey(apiKeyHeader);
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'Invalid API key' },
+        { status: 401 }
+      );
+    }
+
+    // Check credits (enterprise has unlimited)
+    if (apiKey.credits !== -1 && apiKey.credits <= 0) {
+      return NextResponse.json(
+        { error: 'No credits remaining. Please purchase more.' },
+        { status: 402 }
       );
     }
 
@@ -37,6 +55,17 @@ export async function POST(request: Request) {
       );
     }
 
+    // Use credit (except enterprise)
+    if (apiKey.credits !== -1) {
+      const creditUsed = await useCredit(apiKeyHeader);
+      if (!creditUsed) {
+        return NextResponse.json(
+          { error: 'Failed to consume credit' },
+          { status: 500 }
+        );
+      }
+    }
+
     // Process with real AI
     const result = await processWithAi(text, mode);
 
@@ -45,6 +74,7 @@ export async function POST(request: Request) {
       provider: result.provider,
       model: result.model,
       mode,
+      creditsRemaining: apiKey.credits === -1 ? 'unlimited' : apiKey.credits - 1,
     });
   } catch (e) {
     return NextResponse.json(

@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     if (!RESEND_API_KEY) {
       return NextResponse.json(
-        { error: 'Email service not configured' },
+        { error: 'Email service not configured. RESEND_API_KEY is missing.' },
         { status: 500 }
       );
     }
@@ -79,15 +79,15 @@ export async function POST(request: Request) {
 
     if (error) {
       return NextResponse.json(
-        { error: error.message },
+        { error: `Resend error: ${error.message}` },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ success: true, id: data?.id });
-  } catch {
+  } catch (e) {
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: `Internal error: ${e instanceof Error ? e.message : 'Unknown'}` },
       { status: 500 }
     );
   }

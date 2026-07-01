@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     const resend = new Resend(RESEND_API_KEY);
 
     const { data, error } = await resend.emails.send({
-      from: 'AI CFSSR <onboarding@resend.dev>',
+      from: 'AI CFSSR <noreply@cfssr.cf>',
       to: email,
       subject: 'Your AI CFSSR API Key',
       html: `

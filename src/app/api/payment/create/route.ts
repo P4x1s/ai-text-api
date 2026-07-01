@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PLANS } from '@/lib/storage';
 
-// Your TRON wallet address for receiving payments
-const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS || 'TBfAn71a2GjcpGtd5noRAE59QnvkEj7uME';
-
 export async function POST(request: Request) {
   try {
     const { plan } = await request.json();
@@ -15,9 +12,10 @@ export async function POST(request: Request) {
       );
     }
 
+    const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS;
     if (!MY_TRON_ADDRESS) {
       return NextResponse.json(
-        { error: 'Payment system not configured. Please set MY_TRON_ADDRESS.' },
+        { error: 'Payment system not configured.' },
         { status: 500 }
       );
     }
@@ -32,11 +30,11 @@ export async function POST(request: Request) {
       plan: plan,
       planName: planInfo.name,
       credits: planInfo.credits,
-      instructions: `Send exactly ${planInfo.price} USDT (TRC20) to the address above. After payment, verify with your TRON wallet address.`,
+      instructions: `Send exactly ${planInfo.price} USDT (TRC20) to the address above.`,
     });
-  } catch {
+  } catch (e) {
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: e instanceof Error ? e.message : 'Unknown' },
       { status: 500 }
     );
   }

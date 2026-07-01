@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getPayment, confirmPayment, createApiKey } from '@/lib/storage';
+import { createApiKey, PLANS } from '@/lib/storage';
 import { verifyUsdtPayment, isValidTronAddress } from '@/lib/tron';
 
 // Your TRON wallet address
@@ -10,19 +10,19 @@ const TEST_MODE = process.env.TEST_MODE === 'true';
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const paymentId = searchParams.get('paymentId');
     const senderAddress = searchParams.get('senderAddress');
+    const plan = searchParams.get('plan');
     
-    if (!paymentId) {
+    if (!senderAddress) {
       return NextResponse.json(
-        { error: 'paymentId is required' },
+        { error: 'senderAddress is required' },
         { status: 400 }
       );
     }
 
-    if (!senderAddress) {
+    if (!plan || !(plan in PLANS)) {
       return NextResponse.json(
-        { error: 'senderAddress is required for payment verification' },
+        { error: 'plan is required (starter, pro, enterprise)' },
         { status: 400 }
       );
     }
@@ -34,21 +34,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const payment = getPayment(paymentId);
-    
-    if (!payment) {
-      return NextResponse.json(
-        { error: 'Payment not found' },
-        { status: 404 }
-      );
-    }
-
-    if (payment.status === 'confirmed') {
-      return NextResponse.json({
-        status: 'confirmed',
-        message: 'Payment already confirmed',
-      });
-    }
+    const planInfo = PLANS[plan as keyof typeof PLANS];
 
     // Skip blockchain verification in test mode
     if (!TEST_MODE) {
@@ -56,7 +42,7 @@ export async function GET(request: Request) {
       const result = await verifyUsdtPayment(
         senderAddress,
         MY_TRON_ADDRESS,
-        payment.amount,
+        planInfo.price,
         60, // within last 60 minutes
         TRONGRID_API_KEY
       );
@@ -69,24 +55,17 @@ export async function GET(request: Request) {
       }
     }
 
-    // Payment verified (or test mode), now confirm and generate API key
-    const confirmed = confirmPayment(paymentId);
+    // Payment verified (or test mode), generate API key
+    const apiKey = createApiKey(plan);
     
-    if (confirmed) {
-      const apiKey = createApiKey(confirmed.plan);
-      return NextResponse.json({
-        status: 'confirmed',
-        apiKey: apiKey.key,
-        txHash: TEST_MODE ? 'test-mode-transaction' : undefined,
-        plan: confirmed.plan,
-        credits: apiKey.credits,
-        message: 'Payment confirmed! Your API key is ready.',
-      });
-    }
-
     return NextResponse.json({
-      status: 'pending',
-      message: 'Payment not yet confirmed. Please wait.',
+      status: 'confirmed',
+      apiKey: apiKey.key,
+      txHash: TEST_MODE ? 'test-mode-transaction' : undefined,
+      plan: plan,
+      planName: planInfo.name,
+      credits: apiKey.credits,
+      message: 'Payment confirmed! Your API key is ready.',
     });
   } catch {
     return NextResponse.json(

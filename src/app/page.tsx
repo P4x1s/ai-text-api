@@ -11,12 +11,13 @@ const PLANS = [
 export default function Home() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [paymentInfo, setPaymentInfo] = useState<{
-    paymentId: string;
     address: string;
     amount: number;
     currency: string;
     network: string;
     plan: string;
+    planName: string;
+    credits: number;
   } | null>(null);
   const [apiKey, setApiKey] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +59,7 @@ export default function Home() {
     setVerifyError('');
     
     try {
-      const res = await fetch(`/api/payment/verify?paymentId=${paymentInfo.paymentId}&senderAddress=${senderAddress}`);
+      const res = await fetch(`/api/payment/verify?senderAddress=${senderAddress}&plan=${paymentInfo.plan}`);
       const data = await res.json();
       if (data.apiKey) {
         setApiKey(data.apiKey);
@@ -73,7 +74,7 @@ export default function Home() {
               body: JSON.stringify({
                 email,
                 apiKey: data.apiKey,
-                plan: data.plan,
+                plan: data.planName,
                 credits: data.credits,
               }),
             });
@@ -84,6 +85,8 @@ export default function Home() {
         }
       } else if (data.error) {
         setVerifyError(data.error);
+      } else if (data.message) {
+        setVerifyError(data.message);
       }
     } catch (err) {
       console.error(err);

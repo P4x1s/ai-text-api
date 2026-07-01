@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { createPayment, PLANS } from '@/lib/storage';
+import { PLANS } from '@/lib/storage';
 
 // Your TRON wallet address for receiving payments
 const MY_TRON_ADDRESS = process.env.MY_TRON_ADDRESS || 'TBfAn71a2GjcpGtd5noRAE59QnvkEj7uME';
 
 export async function POST(request: Request) {
   try {
-    const { plan, senderAddress } = await request.json();
+    const { plan } = await request.json();
     
     if (!plan || !(plan in PLANS)) {
       return NextResponse.json(
@@ -23,16 +23,15 @@ export async function POST(request: Request) {
     }
 
     const planInfo = PLANS[plan as keyof typeof PLANS];
-    const payment = createPayment(plan, planInfo.price);
 
     return NextResponse.json({
-      paymentId: payment.id,
-      address: MY_TRON_ADDRESS, // Your receiving address
-      amount: payment.amount,
+      address: MY_TRON_ADDRESS,
+      amount: planInfo.price,
       currency: 'USDT',
       network: 'TRC20',
-      plan: planInfo.name,
-      senderAddress: senderAddress || null,
+      plan: plan,
+      planName: planInfo.name,
+      credits: planInfo.credits,
       instructions: `Send exactly ${planInfo.price} USDT (TRC20) to the address above. After payment, verify with your TRON wallet address.`,
     });
   } catch {

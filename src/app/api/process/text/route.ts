@@ -46,10 +46,18 @@ export async function POST(request: Request) {
       );
     }
 
+    // Input size limit (10KB)
+    if (text.length > 10000) {
+      return NextResponse.json(
+        { error: 'Text too large. Maximum 10,000 characters.' },
+        { status: 400 }
+      );
+    }
+
     const validModes = ['paraphrase', 'summarize', 'grammar', 'expand', 'simplify', 'translate_to_en', 'translate_to_zh'];
     if (!mode || !validModes.includes(mode)) {
       return NextResponse.json(
-        { error: `mode must be: ${validModes.join(', ')}` },
+        { error: 'Invalid mode' },
         { status: 400 }
       );
     }

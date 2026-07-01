@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { getApiKey } from '@/lib/storage';
 
 export async function POST(request: Request) {
   try {
@@ -21,10 +22,24 @@ export async function POST(request: Request) {
       );
     }
 
+    // Verify API key exists in database (prevents unauthorized email sending)
+    const keyData = await getApiKey(apiKey);
+    if (!keyData) {
+      return NextResponse.json(
+        { error: 'Invalid API key' },
+        { status: 401 }
+      );
+    }
+
+    // Rate limit: max 3 emails per API key
+    // (Simple in-memory check - in production use Redis/database)
+    const emailKey = `email_count:${apiKey}`;
+    // For now, we just verify the key exists
+
     const RESEND_API_KEY = process.env.RESEND_API_KEY;
     if (!RESEND_API_KEY) {
       return NextResponse.json(
-        { error: 'Email service not configured. RESEND_API_KEY is missing.' },
+        { error: 'Email service not configured.' },
         { status: 500 }
       );
     }

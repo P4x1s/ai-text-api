@@ -3,7 +3,18 @@ import { PLANS } from '@/lib/storage';
 
 export async function POST(request: Request) {
   try {
-    const { plan } = await request.json();
+    const text = await request.text();
+    let plan: string | undefined;
+    
+    try {
+      const body = JSON.parse(text);
+      plan = body.plan;
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid JSON body' },
+        { status: 400 }
+      );
+    }
     
     if (!plan || !(plan in PLANS)) {
       return NextResponse.json(

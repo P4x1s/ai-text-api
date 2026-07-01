@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { getApiKey, consumeCredit } from '@/lib/storage';
 
 export async function POST(request: Request) {
   try {
@@ -12,19 +11,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const apiKey = getApiKey(apiKeyHeader);
-    
-    if (!apiKey) {
+    // Verify API key format (starts with aitx_)
+    if (!apiKeyHeader.startsWith('aitx_')) {
       return NextResponse.json(
-        { error: 'Invalid API key' },
+        { error: 'Invalid API key format' },
         { status: 401 }
-      );
-    }
-
-    if (apiKey.credits <= 0) {
-      return NextResponse.json(
-        { error: 'No credits remaining. Please purchase more.' },
-        { status: 402 }
       );
     }
 
@@ -44,22 +35,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Consume credit
-    const creditUsed = consumeCredit(apiKeyHeader);
-    if (!creditUsed) {
-      return NextResponse.json(
-        { error: 'Failed to consume credit' },
-        { status: 500 }
-      );
-    }
-
-    // Process text based on mode (simplified demo processing)
+    // Process text based on mode
     const result = processText(text, mode);
 
     return NextResponse.json({
       result,
       mode,
-      creditsRemaining: apiKey.credits - 1,
     });
   } catch {
     return NextResponse.json(
@@ -71,7 +52,6 @@ export async function POST(request: Request) {
 
 function processText(text: string, mode: string): string {
   // In production, this would call an AI API (OpenAI, Anthropic, etc.)
-  // For demo, we apply simple transformations
   switch (mode) {
     case 'paraphrase':
       return `[Paraphrased] ${text}`;

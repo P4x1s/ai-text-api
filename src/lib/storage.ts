@@ -85,7 +85,8 @@ export function consumeCredit(key: string): boolean {
 }
 
 export const PLANS = {
-  starter: { price: 5, credits: 1000, name: 'Starter' },
-  pro: { price: 20, credits: 10000, name: 'Pro' },
-  enterprise: { price: 100, credits: 100000, name: 'Enterprise' },
+  trial: { price: 1, credits: 500, name: 'Trial' },
+  starter: { price: 5, credits: 10000, name: 'Starter' },
+  pro: { price: 20, credits: 200000, name: 'Pro' },
+  enterprise: { price: 100, credits: -1, name: 'Enterprise' },
 } as const;

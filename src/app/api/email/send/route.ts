@@ -57,7 +57,7 @@ export async function POST(request: Request) {
 
             <div style="background-color: #111827; border: 1px solid #374151; border-radius: 12px; padding: 24px; margin-bottom: 24px;">
               <p style="color: #9ca3af; font-size: 14px; margin-bottom: 8px;">Plan: <strong style="color: #f9fafb;">${plan}</strong></p>
-              <p style="color: #9ca3af; font-size: 14px; margin: 0;">Credits: <strong style="color: #10b981;">${credits}</strong></p>
+              <p style="color: #9ca3af; font-size: 14px; margin: 0;">Credits: <strong style="color: #10b981;">${credits === -1 ? 'Unlimited' : credits}</strong></p>
             </div>
 
             <div style="background-color: #111827; border: 1px solid #374151; border-radius: 12px; padding: 24px; margin-bottom: 32px;">

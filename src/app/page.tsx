@@ -3,9 +3,10 @@
 import { useState } from 'react';
 
 const PLANS = [
-  { id: 'starter', name: 'Starter', price: 5, credits: 1000, features: ['1,000 API calls', 'Basic text processing', 'Email support'] },
-  { id: 'pro', name: 'Pro', price: 20, credits: 10000, features: ['10,000 API calls', 'Advanced AI models', 'Priority support', 'Custom modes'] },
-  { id: 'enterprise', name: 'Enterprise', price: 100, credits: 100000, features: ['100,000 API calls', 'Custom AI models', 'Dedicated support', 'SLA guarantee'] },
+  { id: 'trial', name: 'Trial', price: 1, credits: 500, features: ['500 API calls', 'Basic text processing', 'Email support'] },
+  { id: 'starter', name: 'Starter', price: 5, credits: 10000, features: ['10,000 API calls', 'Basic text processing', 'Email support'] },
+  { id: 'pro', name: 'Pro', price: 20, credits: 200000, features: ['200,000 API calls', 'Advanced AI models', 'Priority support', 'Custom modes'] },
+  { id: 'enterprise', name: 'Enterprise', price: 100, credits: -1, features: ['Unlimited API calls', 'Custom AI models', 'Dedicated support', 'SLA guarantee'] },
 ];
 
 export default function Home() {
@@ -164,7 +165,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
-            { step: '1', title: 'Choose Plan', desc: 'Select Starter, Pro, or Enterprise' },
+            { step: '1', title: 'Choose Plan', desc: 'Select Trial, Starter, Pro, or Enterprise' },
             { step: '2', title: 'Pay USDT', desc: 'Send crypto to the generated address' },
             { step: '3', title: 'Get API Key', desc: 'Instant access, start building' },
           ].map((item) => (
@@ -184,7 +185,7 @@ export default function Home() {
         <h2 className="text-3xl font-bold text-center mb-4">Pricing</h2>
         <p className="text-gray-400 text-center mb-12">One-time payment. No subscriptions. Pay with USDT (TRC20).</p>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {PLANS.map((plan) => (
             <div
               key={plan.id}

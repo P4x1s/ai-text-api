@@ -1,4 +1,4 @@
-# AI CFSSR - Text Processing API with Crypto Payments
+# Text Processing API with Crypto Payments
 
 A monetizable AI text processing API that accepts USDT (TRC20) cryptocurrency payments.
 

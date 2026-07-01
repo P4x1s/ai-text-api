@@ -104,5 +104,5 @@ export async function verifyUsdtPayment(
  * Check if an address is a valid TRON address
  */
 export function isValidTronAddress(address: string): boolean {
-  return /^T[A-Za-z1-9]{33}$/.test(address);
+  return /^T[A-Za-z0-9]{33}$/.test(address);
 }

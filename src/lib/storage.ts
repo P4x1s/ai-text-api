@@ -1,87 +1,28 @@
-import { randomBytes, createHash } from 'crypto';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+
+// Lazy initialize Supabase client
+let supabase: SupabaseClient | null = null;
+
+function getSupabase(): SupabaseClient {
+  if (!supabase) {
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_ANON_KEY;
+    
+    if (!url || !key) {
+      throw new Error('SUPABASE_URL and SUPABASE_ANON_KEY are required');
+    }
+    
+    supabase = createClient(url, key);
+  }
+  return supabase;
+}
 
 export interface ApiKey {
   id: string;
   key: string;
   plan: string;
   credits: number;
-  createdAt: string;
-}
-
-export interface Payment {
-  id: string;
-  address: string;
-  amount: number;
-  plan: string;
-  status: 'pending' | 'confirmed' | 'expired';
-  createdAt: string;
-}
-
-const apiKeys = new Map<string, ApiKey>();
-const payments = new Map<string, Payment>();
-
-export function generateAddress(): string {
-  const hash = createHash('sha256')
-    .update(randomBytes(32))
-    .digest('hex');
-  return 'T' + hash.slice(0, 33);
-}
-
-export function createPayment(plan: string, amount: number): Payment {
-  const id = randomBytes(16).toString('hex');
-  const address = generateAddress();
-  const payment: Payment = {
-    id,
-    address,
-    amount,
-    plan,
-    status: 'pending',
-    createdAt: new Date().toISOString(),
-  };
-  payments.set(id, payment);
-  return payment;
-}
-
-export function getPayment(id: string): Payment | undefined {
-  return payments.get(id);
-}
-
-export function confirmPayment(id: string): Payment | undefined {
-  const payment = payments.get(id);
-  if (payment) {
-    payment.status = 'confirmed';
-    payments.set(id, payment);
-  }
-  return payment;
-}
-
-export function createApiKey(plan: string): ApiKey {
-  const id = randomBytes(16).toString('hex');
-  const key = 'aitx_' + randomBytes(32).toString('hex');
-  const credits = plan === 'starter' ? 1000 : plan === 'pro' ? 10000 : 100000;
-  const apiKey: ApiKey = {
-    id,
-    key,
-    plan,
-    credits,
-    createdAt: new Date().toISOString(),
-  };
-  apiKeys.set(key, apiKey);
-  return apiKey;
-}
-
-export function getApiKey(key: string): ApiKey | undefined {
-  return apiKeys.get(key);
-}
-
-export function consumeCredit(key: string): boolean {
-  const apiKey = apiKeys.get(key);
-  if (apiKey && apiKey.credits > 0) {
-    apiKey.credits -= 1;
-    apiKeys.set(key, apiKey);
-    return true;
-  }
-  return false;
+  created_at: string;
 }
 
 export const PLANS = {
@@ -90,3 +31,68 @@ export const PLANS = {
   pro: { price: 20, credits: 200000, name: 'Pro' },
   enterprise: { price: 100, credits: -1, name: 'Enterprise' },
 } as const;
+
+export async function createApiKey(plan: string): Promise<ApiKey> {
+  const client = getSupabase();
+  const id = crypto.randomUUID();
+  const key = 'aitx_' + crypto.randomUUID().replace(/-/g, '');
+  const credits = PLANS[plan as keyof typeof PLANS]?.credits || 0;
+
+  const { data, error } = await client
+    .from('api_keys')
+    .insert({
+      id,
+      key,
+      plan,
+      credits,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Supabase insert error:', error);
+    throw new Error('Failed to create API key');
+  }
+
+  return data;
+}
+
+export async function getApiKey(key: string): Promise<ApiKey | null> {
+  const client = getSupabase();
+  
+  const { data, error } = await client
+    .from('api_keys')
+    .select('*')
+    .eq('key', key)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data;
+}
+
+export async function useCredit(key: string): Promise<boolean> {
+  const apiKey = await getApiKey(key);
+  if (!apiKey) return false;
+
+  // Enterprise has unlimited credits
+  if (apiKey.credits === -1) return true;
+
+  if (apiKey.credits > 0) {
+    const client = getSupabase();
+    const { error } = await client
+      .from('api_keys')
+      .update({ credits: apiKey.credits - 1 })
+      .eq('key', key);
+
+    if (error) {
+      console.error('Supabase update error:', error);
+      return false;
+    }
+    return true;
+  }
+
+  return false;
+}

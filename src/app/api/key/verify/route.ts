@@ -13,7 +13,7 @@ export async function GET(request: Request) {
       );
     }
 
-    const apiKey = getApiKey(key);
+    const apiKey = await getApiKey(key);
     
     if (!apiKey) {
       return NextResponse.json(
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       valid: true,
       plan: apiKey.plan,
       credits: apiKey.credits,
-      createdAt: apiKey.createdAt,
+      createdAt: apiKey.created_at,
     });
   } catch {
     return NextResponse.json(

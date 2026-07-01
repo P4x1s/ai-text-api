@@ -22,7 +22,7 @@ export async function GET(request: Request) {
 
     if (!plan || !(plan in PLANS)) {
       return NextResponse.json(
-        { error: 'plan is required (starter, pro, enterprise)' },
+        { error: 'plan is required (trial, starter, pro, enterprise)' },
         { status: 400 }
       );
     }
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
     }
 
     // Payment verified (or test mode), generate API key
-    const apiKey = createApiKey(plan);
+    const apiKey = await createApiKey(plan);
     
     return NextResponse.json({
       status: 'confirmed',

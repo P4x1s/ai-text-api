@@ -27,6 +27,7 @@ export default function Home() {
   const [senderAddress, setSenderAddress] = useState('');
   const [email, setEmail] = useState('');
   const [emailSent, setEmailSent] = useState(false);
+  const [verifyError, setVerifyError] = useState('');
 
   const handlePurchase = async (plan: string) => {
     setLoading(true);
@@ -49,7 +50,12 @@ export default function Home() {
 
   const handleVerify = async () => {
     if (!paymentInfo) return;
+    if (!senderAddress) {
+      setVerifyError('Please enter your TRON wallet address');
+      return;
+    }
     setLoading(true);
+    setVerifyError('');
     
     try {
       const res = await fetch(`/api/payment/verify?paymentId=${paymentInfo.paymentId}&senderAddress=${senderAddress}`);
@@ -76,9 +82,12 @@ export default function Home() {
             console.error('Failed to send email');
           }
         }
+      } else if (data.error) {
+        setVerifyError(data.error);
       }
     } catch (err) {
       console.error(err);
+      setVerifyError('Verification failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -257,6 +266,11 @@ export default function Home() {
               >
                 {loading ? 'Verifying...' : 'I\'ve Paid - Verify'}
               </button>
+              {verifyError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+                  {verifyError}
+                </div>
+              )}
               <button
                 onClick={() => setPaymentInfo(null)}
                 className="w-full py-3 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium transition"

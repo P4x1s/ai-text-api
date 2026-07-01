@@ -19,6 +19,20 @@ export async function GET(request: Request) {
       );
     }
 
+    if (!senderAddress) {
+      return NextResponse.json(
+        { error: 'senderAddress is required for payment verification' },
+        { status: 400 }
+      );
+    }
+
+    if (!isValidTronAddress(senderAddress)) {
+      return NextResponse.json(
+        { error: 'Invalid TRON address format. Must start with T and be 34 characters.' },
+        { status: 400 }
+      );
+    }
+
     const payment = getPayment(paymentId);
     
     if (!payment) {
@@ -35,33 +49,23 @@ export async function GET(request: Request) {
       });
     }
 
-    // If sender address is provided, verify on blockchain
-    if (senderAddress) {
-      if (!isValidTronAddress(senderAddress)) {
-        return NextResponse.json(
-          { error: 'Invalid TRON address format' },
-          { status: 400 }
-        );
-      }
+    // Verify on blockchain using TronGrid API
+    const result = await verifyUsdtPayment(
+      senderAddress,
+      MY_TRON_ADDRESS,
+      payment.amount,
+      60, // within last 60 minutes
+      TRONGRID_API_KEY
+    );
 
-      // Verify on blockchain using TronGrid API
-      const result = await verifyUsdtPayment(
-        senderAddress,
-        MY_TRON_ADDRESS,
-        payment.amount,
-        60, // within last 60 minutes
-        TRONGRID_API_KEY
-      );
-
-      if (!result.confirmed) {
-        return NextResponse.json({
-          status: 'pending',
-          message: result.error || 'Payment not yet confirmed on blockchain. Please wait a few minutes and try again.',
-        });
-      }
+    if (!result.confirmed) {
+      return NextResponse.json({
+        status: 'pending',
+        message: result.error || 'Payment not yet confirmed on blockchain. Please wait a few minutes and try again.',
+      });
     }
 
-    // Confirm payment and generate API key
+    // Payment verified on blockchain, now confirm and generate API key
     const confirmed = confirmPayment(paymentId);
     
     if (confirmed) {
@@ -69,6 +73,7 @@ export async function GET(request: Request) {
       return NextResponse.json({
         status: 'confirmed',
         apiKey: apiKey.key,
+        txHash: result.txHash,
         plan: confirmed.plan,
         credits: apiKey.credits,
         message: 'Payment confirmed! Your API key is ready.',

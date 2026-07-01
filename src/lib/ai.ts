@@ -147,6 +147,14 @@ export async function processWithAi(
         process.env.CLAUDE_MODEL || 'claude-3-haiku-20240307'
       );
 
+    case 'mimo':
+      return callOpenAiCompatible(
+        messages,
+        process.env.MIMO_API_KEY || '',
+        process.env.MIMO_BASE_URL || 'https://token-plan-sgp.xiaomimimo.com/v1',
+        process.env.MIMO_MODEL || 'MiMo-7B-RL'
+      );
+
     default:
       throw new Error(`Unknown AI provider: ${AI_PROVIDER}`);
   }

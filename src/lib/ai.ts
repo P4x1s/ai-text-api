@@ -151,8 +151,8 @@ export async function processWithAi(
       return callOpenAiCompatible(
         messages,
         process.env.MIMO_API_KEY || '',
-        process.env.MIMO_BASE_URL || 'https://token-plan-sgp.xiaomimimo.com/v1',
-        process.env.MIMO_MODEL || 'MiMo-7B-RL'
+        process.env.MIMO_BASE_URL || 'https://token-plan-cn.xiaomimimo.com/v1',
+        process.env.MIMO_MODEL || 'mimo-v2.5'
       );
 
     default:
